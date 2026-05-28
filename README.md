@@ -32,4 +32,18 @@ On Linux, GTK/PyGObject is usually installed through the system package manager.
 python3 app.py
 ```
 
+## Import Local Data
+
+Put an ODS export at `utility_data.ods` and run:
+
+```bash
+python3 seed_data.py
+```
+
+Or pass a custom path:
+
+```bash
+UTILITY_TRACKER_ODS=/path/to/file.ods python3 seed_data.py
+```
+
 Local databases, spreadsheets, caches, and logs are intentionally ignored by git.

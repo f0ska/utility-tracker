@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 
 from app_logging import APP_LOGGER_NAME, get_log_path, get_log_status, mark_logs_seen, setup_logging
+from paths import APP_ID, icon_source_path, linux_icon_dir, project_path
 
 setup_logging()
 LOGGER = logging.getLogger(APP_LOGGER_NAME)
@@ -25,7 +26,7 @@ from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 
 class UtilityTrackerApp(Gtk.Application):
     def __init__(self):
-        super().__init__(application_id="io.github.f0ska.utilitytracker",
+        super().__init__(application_id=APP_ID,
                          flags=Gio.ApplicationFlags.FLAGS_NONE)
         db.init_db()
         self.install_system_icon()
@@ -34,15 +35,17 @@ class UtilityTrackerApp(Gtk.Application):
         self.details_origin = "dashboard"
 
     def install_system_icon(self):
+        if sys.platform != "linux":
+            return
+
         try:
             import shutil
-            home = os.path.expanduser("~")
-            dest_dir = os.path.join(home, ".local", "share", "icons", "hicolor", "scalable", "apps")
+            dest_dir = linux_icon_dir()
             os.makedirs(dest_dir, exist_ok=True)
             
-            src_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon.svg")
+            src_path = icon_source_path()
             if os.path.exists(src_path):
-                shutil.copy2(src_path, os.path.join(dest_dir, "io.github.f0ska.utilitytracker.svg"))
+                shutil.copy2(src_path, os.path.join(dest_dir, f"{APP_ID}.svg"))
                 shutil.copy2(src_path, os.path.join(dest_dir, "icon.svg"))
         except Exception as e:
             LOGGER.warning("Could not install system icon", exc_info=True)
@@ -54,7 +57,16 @@ class UtilityTrackerApp(Gtk.Application):
         
         # Configure Window Icon for Taskbar/Dock
         try:
-            self.win.set_icon_name("io.github.f0ska.utilitytracker")
+            icon_theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
+            icon_theme.add_search_path(project_path())
+            icon_theme.add_search_path(linux_icon_dir())
+
+            for icon_name in (APP_ID, "icon"):
+                if icon_theme.has_icon(icon_name):
+                    self.win.set_icon_name(icon_name)
+                    break
+            else:
+                self.win.set_icon_name(APP_ID)
         except Exception as e:
             LOGGER.warning("Could not set window icon", exc_info=True)
         
@@ -2581,7 +2593,7 @@ class UtilityTrackerApp(Gtk.Application):
         btn_cancel.connect("clicked", lambda x: self.switch_tab("history"))
 
 if __name__ == "__main__":
-    GLib.set_prgname('io.github.f0ska.utilitytracker')
+    GLib.set_prgname(APP_ID)
     GLib.set_application_name('UtilityTracker')
     app = UtilityTrackerApp()
     sys.exit(app.run(sys.argv))

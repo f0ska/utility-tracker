@@ -1,9 +1,10 @@
 import sqlite3
-import os
 from contextlib import contextmanager
 from datetime import datetime
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "utility_tracker.db")
+from paths import database_path
+
+DB_PATH = database_path()
 
 # Whitelist of all valid column names for the readings table.
 # This prevents potential issues from unexpected keys in reading_data dicts.

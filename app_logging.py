@@ -1,10 +1,10 @@
 import logging
-import os
 import sys
 import threading
 import warnings
-import tempfile
 from logging.handlers import RotatingFileHandler
+
+from paths import log_path
 
 
 APP_LOGGER_NAME = "utilitytracker"
@@ -42,25 +42,7 @@ class LogStatusHandler(logging.Handler):
 
 
 def get_log_path():
-    state_home = os.environ.get("XDG_STATE_HOME")
-    if not state_home:
-        state_home = os.path.join(os.path.expanduser("~"), ".local", "state")
-
-    candidates = [
-        os.path.join(state_home, "utilitytracker"),
-        os.path.join("/tmp", "utilitytracker"),
-    ]
-
-    for log_dir in candidates:
-        try:
-            os.makedirs(log_dir, exist_ok=True)
-            with tempfile.NamedTemporaryFile(dir=log_dir, delete=True):
-                pass
-            return os.path.join(log_dir, "app.log")
-        except OSError:
-            continue
-
-    raise OSError("Could not create UtilityTracker log directory")
+    return log_path()
 
 
 def setup_logging():

@@ -32,6 +32,12 @@ On Linux, GTK/PyGObject is usually installed through the system package manager.
 python3 app.py
 ```
 
+## Install Desktop Shortcut
+
+```bash
+./install_desktop_entry.sh
+```
+
 ## Import Local Data
 
 Put an ODS export at `utility_data.ods` and run:

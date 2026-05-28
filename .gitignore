@@ -1,0 +1,10 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases (SQLite local state — not part of source code)
+*.db
+
+# Local spreadsheets / imports with personal utility data
+*.ods
